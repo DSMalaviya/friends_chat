@@ -14,6 +14,9 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  bool _isShowSticker = false;
+  TextEditingController _controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +46,90 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           children: [
             Expanded(child: Container()),
+            Container(
+              alignment: AlignmentDirectional.topStart,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(width: 2, color: Colors.grey[400])),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                          icon: _isShowSticker
+                              ? Icon(Icons.keyboard)
+                              : Icon(Icons.emoji_emotions_outlined),
+                          iconSize: 24,
+                          color: Colors.grey[600],
+                          onPressed: () {
+                            setState(() {
+                              _isShowSticker = !_isShowSticker;
+                            });
+                          }),
+                    ],
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      decoration: InputDecoration(
+                        hintText: "Enter message",
+                        border: InputBorder.none,
+                      ),
+                      keyboardType: TextInputType.multiline,
+                      autocorrect: true,
+                      cursorColor: Colors.black87,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      children: [
+                        Material(
+                          child: InkWell(
+                            child: RotationTransition(
+                              turns: const AlwaysStoppedAnimation(45 / 360),
+                              child: Icon(
+                                Icons.attach_file,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            onTap: () {},
+                          ),
+                        ),
+                        SizedBox(
+                          width: 14,
+                        ),
+                        Material(
+                          child: InkWell(
+                            child: Icon(
+                              Icons.camera_alt,
+                              color: Colors.grey[600],
+                            ),
+                            onTap: () {},
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: 6,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {},
+                    child: Icon(
+                      Icons.send,
+                      size: 20,
+                    ),
+                    style: ElevatedButton.styleFrom(
+                        shape: CircleBorder(), elevation: 5.0),
+                  )
+                ],
+              ),
+            ),
           ],
         ),
       ),

@@ -27,8 +27,8 @@ class _MyAppState extends State<MyApp> {
   userid() async {
     await Hive.openBox('myBox');
     var box = Hive.box('myBox');
-    print(userid);
-    return box.get('userId');
+    String userid = box.get('userId');
+    return userid;
   }
 
   @override
@@ -45,7 +45,8 @@ class _MyAppState extends State<MyApp> {
             return Splash();
           } else {
             if (snapshot.hasData) {
-              return ChatScreen(userid: snapshot.data.toString());
+              // print(snapshot.data);
+              return ChatScreen(userid: snapshot.data);
             } else {
               return AuthScreen();
             }
