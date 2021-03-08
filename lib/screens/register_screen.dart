@@ -1,9 +1,9 @@
-import 'dart:io';
-
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:friends_chat/screens/auth_screen.dart';
 import 'package:friends_chat/widgets/registerForm.dart';
@@ -19,8 +19,9 @@ class _RegisterState extends State<Register> {
   FirebaseAuth auth = FirebaseAuth.instance;
   firebase_storage.FirebaseStorage fbs =
       firebase_storage.FirebaseStorage.instance;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  Future<void> register(userEmail, userPassword, profilePic) async {
+  Future<void> register(username, userEmail, userPassword, profilePic) async {
     FocusScope.of(context).unfocus();
     setState(() {
       isLoading = true;
@@ -39,7 +40,15 @@ class _RegisterState extends State<Register> {
 
       //get image url
       var profilePicUrl = await refurl.getDownloadURL();
-      print(profilePicUrl);
+
+      //add data to the firebase cloud firestore
+      var data = await firestore.collection('users').add({
+        'UserName': username,
+        'UserEmail': userEmail,
+        'UserId': uid,
+        'ProfilePic': profilePicUrl,
+        'Date_of_join': DateTime.now().toIso8601String(),
+      });
 
       Navigator.of(context).popAndPushNamed(AuthScreen.route);
     } on FirebaseAuthException catch (e) {

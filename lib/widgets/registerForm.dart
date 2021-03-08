@@ -5,7 +5,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:toast/toast.dart';
 
 class RegisterForm extends StatefulWidget {
-  final Function(String email, String password, File pickedimage) registerFn;
+  final Function(
+          String username, String email, String password, File pickedimage)
+      registerFn;
   final bool isLoading;
   RegisterForm({this.registerFn, this.isLoading});
   @override
@@ -165,7 +167,8 @@ class _RegisterFormState extends State<RegisterForm> {
                       onPressed: () {
                         formkey.currentState.validate();
                         formkey.currentState.save();
-                        widget.registerFn(email, password, pickedimage);
+                        widget.registerFn(
+                            username, email, password, pickedimage);
                       },
                       icon: Icon(Icons.account_circle_rounded),
                       label: Text("Register"),
