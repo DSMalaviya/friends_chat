@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:friends_chat/screens/chatScreen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive/hive.dart';
 
 import 'package:friends_chat/screens/register_screen.dart';
 
@@ -31,8 +31,11 @@ class _AuthScreenState extends State<AuthScreen> {
           email: email, password: password);
       print("login sucess");
       String uid = auth.currentUser.uid.toString();
-      SharedPreferences sp = await SharedPreferences.getInstance();
-      await sp.setString('userId', uid);
+
+      //use hive insted of shared prefrences
+      var box = Hive.box('myBox');
+      box.put('userId', uid);
+
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) {

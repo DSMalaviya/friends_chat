@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:friends_chat/screens/splashScrren.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:friends_chat/screens/auth_screen.dart';
 import 'package:friends_chat/screens/chatScreen.dart';
@@ -10,6 +12,8 @@ import 'package:friends_chat/screens/register_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  final appDocumentDir = await getApplicationDocumentsDirectory();
+  await Hive.initFlutter(appDocumentDir.path);
   runApp(MyApp());
 }
 
@@ -20,12 +24,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String uid = '';
-
-  Future<String> getUid() async {
-    SharedPreferences sp = await SharedPreferences.getInstance();
-    uid = sp.getString('userId');
-    return uid;
+  userid() async {
+    await Hive.openBox('myBox');
+    var box = Hive.box('myBox');
+    print(userid);
+    return box.get('userId');
   }
 
   @override
@@ -48,7 +51,7 @@ class _MyAppState extends State<MyApp> {
             }
           }
         },
-        future: getUid(),
+        future: userid(),
       ),
 
       routes: {
