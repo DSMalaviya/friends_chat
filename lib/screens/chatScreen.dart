@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
-import 'package:emoji_picker/emoji_picker.dart';
 
 import 'package:friends_chat/main.dart';
+import 'package:friends_chat/widgets/new_message.dart';
 
 class ChatScreen extends StatefulWidget {
   static String route = '/chat';
@@ -14,8 +15,55 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  bool _isShowSticker = false;
-  TextEditingController _controller = TextEditingController();
+  bool showStickerKeyboard = false;
+  TextEditingController messageController = TextEditingController();
+  FirebaseFirestore firestoreinstance = FirebaseFirestore.instance;
+  var box = Hive.box('myBox');
+
+//set important data to local storage
+  Future<void> getandsetuserdata() async {
+    try {
+      var dataSnapshot = await firestoreinstance
+          .collection('users')
+          .where('UserId', isEqualTo: widget.userid)
+          .get();
+
+      dataSnapshot.docs.forEach((element) {
+        box.put('ProfilePic', element['ProfilePic']);
+        box.put('UserEmail', element['UserEmail']);
+        box.put('UserName', element['UserName']);
+        box.put('UserDataSet', true);
+        // print(element['ProfilePic']);
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+//send message
+  sendMessage(var newMessage) async {
+    bool isdataset = box.get('UserDataSet');
+    if (isdataset != true) {
+      await getandsetuserdata();
+    }
+
+    String userid = box.get('userId');
+    String userimage = box.get('ProfilePic');
+    String username = box.get('UserName');
+
+    try {
+      var send = await firestoreinstance.collection('message').add({
+        'date': DateTime.now().toIso8601String(),
+        'message': newMessage,
+        'senderId': userid,
+        'senderImage': userimage,
+        'senderName': username,
+        'type': 'text',
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,90 +93,14 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Container(
         child: Column(
           children: [
+            //chat arera
             Expanded(child: Container()),
-            Container(
-              alignment: AlignmentDirectional.topStart,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(width: 2, color: Colors.grey[400])),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      IconButton(
-                          icon: _isShowSticker
-                              ? Icon(Icons.keyboard)
-                              : Icon(Icons.emoji_emotions_outlined),
-                          iconSize: 24,
-                          color: Colors.grey[600],
-                          onPressed: () {
-                            setState(() {
-                              _isShowSticker = !_isShowSticker;
-                            });
-                          }),
-                    ],
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      decoration: InputDecoration(
-                        hintText: "Enter message",
-                        border: InputBorder.none,
-                      ),
-                      keyboardType: TextInputType.multiline,
-                      autocorrect: true,
-                      cursorColor: Colors.black87,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      children: [
-                        Material(
-                          child: InkWell(
-                            child: RotationTransition(
-                              turns: const AlwaysStoppedAnimation(45 / 360),
-                              child: Icon(
-                                Icons.attach_file,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            onTap: () {},
-                          ),
-                        ),
-                        SizedBox(
-                          width: 14,
-                        ),
-                        Material(
-                          child: InkWell(
-                            child: Icon(
-                              Icons.camera_alt,
-                              color: Colors.grey[600],
-                            ),
-                            onTap: () {},
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 6,
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: Icon(
-                      Icons.send,
-                      size: 20,
-                    ),
-                    style: ElevatedButton.styleFrom(
-                        shape: CircleBorder(), elevation: 5.0),
-                  )
-                ],
-              ),
+
+            //chat message area
+            NewMessage(
+              showEmoji: showStickerKeyboard,
+              messageController: messageController,
+              MsgFunction: sendMessage,
             ),
           ],
         ),
