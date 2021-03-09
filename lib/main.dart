@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:friends_chat/screens/aboutMe.dart';
 import 'package:friends_chat/screens/splashScrren.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -34,9 +35,10 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'FRIENDS CHAT',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepPurple,
+        accentColor: Colors.amber,
       ),
       // home: AuthScreen(),
       home: FutureBuilder(
@@ -59,6 +61,7 @@ class _MyAppState extends State<MyApp> {
         AuthScreen.route: (ctx) => AuthScreen(),
         Register.route: (ctx) => Register(),
         ChatScreen.route: (ctx) => ChatScreen(),
+        AboutMe.route: (ctx) => AboutMe(),
       },
     );
   }

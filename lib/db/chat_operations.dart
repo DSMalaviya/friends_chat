@@ -90,3 +90,7 @@ class ChatOperations {
     }
   }
 }
+
+storagebox() {
+  return box;
+}

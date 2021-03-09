@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:friends_chat/screens/aboutMe.dart';
 import 'package:friends_chat/widgets/chat_bubble.dart';
 import 'package:friends_chat/widgets/image_bubble.dart';
 import 'package:friends_chat/widgets/link_preview.dart';
@@ -27,10 +28,57 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-              icon: Icon(Icons.logout),
-              onPressed: () async {
+        title: Text("All Chat"),
+        centerTitle: true,
+      ),
+      backgroundColor: Color.fromRGBO(244, 245, 240, 1),
+
+      //navigation drawer
+
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              padding: EdgeInsets.all(0),
+              child: Image(
+                image: AssetImage(
+                  'assets/images/navdrawer.jpg',
+                ),
+                fit: BoxFit.cover,
+              ),
+              // fit: BoxFit.cover,
+            ),
+            ListTile(
+              title: Text(
+                "All Chat",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[600]),
+              ),
+              trailing: Icon(
+                Icons.group_outlined,
+                size: 30,
+              ),
+              onTap: () {},
+            ),
+            Divider(
+              thickness: 2,
+            ),
+            ListTile(
+              title: Text(
+                "LogOut",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[600]),
+              ),
+              trailing: Icon(
+                Icons.logout,
+                size: 30,
+              ),
+              onTap: () async {
                 try {
                   FirebaseAuth.instance.signOut();
                   var box = Hive.box('myBox');
@@ -43,10 +91,32 @@ class _ChatScreenState extends State<ChatScreen> {
                 } catch (e) {
                   print("an error occured");
                 }
-              })
-        ],
-        centerTitle: true,
+              },
+            ),
+            Divider(
+              thickness: 2,
+            ),
+            ListTile(
+              title: Text(
+                "About Me",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[600]),
+              ),
+              trailing: Icon(
+                Icons.person,
+                size: 30,
+              ),
+              onTap: () {
+                Navigator.of(context).pushNamed(AboutMe.route);
+              },
+            ),
+          ],
+        ),
       ),
+
+      //body
       body: Container(
         height: MediaQuery.of(context).size.height,
         child: Column(
