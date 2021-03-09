@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:friends_chat/widgets/chat_bubble.dart';
+import 'package:friends_chat/widgets/image_bubble.dart';
 import 'package:friends_chat/widgets/link_preview.dart';
 import 'package:hive/hive.dart';
 
@@ -79,6 +80,14 @@ class _ChatScreenState extends State<ChatScreen> {
                           //check message type
                           if (chatDocs[index]['type'] == 'link') {
                             return chatLinkPreview(
+                              message: chatDocs[index]['message'],
+                              senderImgUrl: chatDocs[index]['senderImage'],
+                              keyid: chatDocs[index].id,
+                              isMe: isMe,
+                              sender: chatDocs[index]['senderName'],
+                            );
+                          } else if (chatDocs[index]['type'] == 'image') {
+                            return ImageBubble(
                               message: chatDocs[index]['message'],
                               senderImgUrl: chatDocs[index]['senderImage'],
                               keyid: chatDocs[index].id,
