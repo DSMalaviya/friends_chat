@@ -39,18 +39,33 @@ class MessageBubble extends StatelessWidget {
         children: [
           Container(
             padding: EdgeInsets.only(
-                left: (isMe == true) ? 0 : 25,
-                bottom: 7,
+                left: (isMe == true) ? 0 : 20,
+                bottom: 10,
                 right: (isMe == true) ? 5 : 0),
             key: ValueKey(keyid),
-            width: MediaQuery.of(context).size.width * 0.6,
+            width: MediaQuery.of(context).size.width * 0.7,
             child: Bubble(
               nip:
                   (isMe == true) ? BubbleNip.rightBottom : BubbleNip.leftBottom,
-              child: Text(
-                message,
-                softWrap: true,
-              ),
+              child: (isMe == true)
+                  ? Text(
+                      message,
+                      softWrap: true,
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          sender,
+                          softWrap: true,
+                          style: TextStyle(color: Colors.black54, fontSize: 10),
+                        ),
+                        Text(
+                          message,
+                          softWrap: true,
+                        )
+                      ],
+                    ),
             ),
           )
         ],

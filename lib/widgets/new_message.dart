@@ -76,17 +76,32 @@ class _NewMessageState extends State<NewMessage> {
               ElevatedButton(
                 onPressed: () {
                   //send msg function
+
+                  //in regex the short links are not working
+                  // bool isUrl = RegExp(
+                  //         r'^((?:.|\n)*?)((http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)([-A-Z0-9.]+)(/[-A-Z0-9+&@#/%=~_|!:,.;]*)?(\?[A-Z0-9+&@#/%=~_|!:‌​,.;]*)?)')
+                  //     .hasMatch(widget.messageController.text.trim());
+
+                  //so use inbuilt dart function
+                  bool isUrl = Uri.parse(widget.messageController.text.trim())
+                      .isAbsolute;
                   if (widget.messageController.text.trim() == '') {
                     return null;
+                  } else if (isUrl == true) {
+                    print("link is executed");
+                    widget.MsgFunction(
+                      widget.messageController.text.trim(),
+                      widget.userid,
+                      "link",
+                    );
                   } else {
                     widget.MsgFunction(
                       widget.messageController.text.trim(),
                       widget.userid,
                       "text",
                     );
-                    widget.messageController.clear();
-                    Focus.of(context).unfocus();
                   }
+                  widget.messageController.clear();
                 },
                 child: Icon(
                   Icons.send,
