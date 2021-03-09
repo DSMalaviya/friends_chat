@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:friends_chat/widgets/chat_bubble.dart';
 import 'package:hive/hive.dart';
 
 import 'package:friends_chat/main.dart';
 import 'package:friends_chat/widgets/new_message.dart';
+import 'package:friends_chat/db/chat_operations.dart';
 
 class ChatScreen extends StatefulWidget {
   static String route = '/chat';
@@ -17,53 +18,8 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   bool showStickerKeyboard = false;
   TextEditingController messageController = TextEditingController();
-  FirebaseFirestore firestoreinstance = FirebaseFirestore.instance;
-  var box = Hive.box('myBox');
-
-//set important data to local storage
-  Future<void> getandsetuserdata() async {
-    try {
-      var dataSnapshot = await firestoreinstance
-          .collection('users')
-          .where('UserId', isEqualTo: widget.userid)
-          .get();
-
-      dataSnapshot.docs.forEach((element) {
-        box.put('ProfilePic', element['ProfilePic']);
-        box.put('UserEmail', element['UserEmail']);
-        box.put('UserName', element['UserName']);
-        box.put('UserDataSet', true);
-        // print(element['ProfilePic']);
-      });
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-//send message
-  sendMessage(var newMessage) async {
-    bool isdataset = box.get('UserDataSet');
-    if (isdataset != true) {
-      await getandsetuserdata();
-    }
-
-    String userid = box.get('userId');
-    String userimage = box.get('ProfilePic');
-    String username = box.get('UserName');
-
-    try {
-      var send = await firestoreinstance.collection('message').add({
-        'date': DateTime.now().toIso8601String(),
-        'message': newMessage,
-        'senderId': userid,
-        'senderImage': userimage,
-        'senderName': username,
-        'type': 'text',
-      });
-    } catch (e) {
-      print(e.toString());
-    }
-  }
+  ChatOperations chatoperations = new ChatOperations();
+  bool isMe = false;
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +32,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 try {
                   FirebaseAuth.instance.signOut();
                   var box = Hive.box('myBox');
-                  box.delete('userId');
                   box.clear();
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) {
@@ -91,16 +46,47 @@ class _ChatScreenState extends State<ChatScreen> {
         centerTitle: true,
       ),
       body: Container(
+        height: MediaQuery.of(context).size.height,
         child: Column(
           children: [
-            //chat arera
-            Expanded(child: Container()),
+            Expanded(
+              child: Container(
+                child: StreamBuilder(
+                  stream: firestoreinstance.collection('message').snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else {
+                      final chatDocs = snapshot.data.docs;
+                      return ListView.builder(
+                        physics: BouncingScrollPhysics(),
+                        itemCount: chatDocs.length,
+                        itemBuilder: (context, index) {
+                          if (chatDocs[index]['senderId'] == widget.userid) {
+                            isMe = true;
+                          } else {
+                            isMe = false;
+                          }
+                          return MessageBubble(
+                            message: chatDocs[index]['message'],
+                            senderImgUrl: chatDocs[index]['senderImage'],
+                            keyid: chatDocs[index].id,
+                            isMe: isMe,
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
 
             //chat message area
             NewMessage(
               showEmoji: showStickerKeyboard,
               messageController: messageController,
-              MsgFunction: sendMessage,
+              MsgFunction: chatoperations.sendMessage,
+              userid: widget.userid,
             ),
           ],
         ),

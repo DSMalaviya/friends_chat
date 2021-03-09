@@ -4,8 +4,11 @@ import 'package:friends_chat/widgets/emoji_picker.dart';
 class NewMessage extends StatefulWidget {
   bool showEmoji;
   TextEditingController messageController;
-  Function(dynamic message) MsgFunction;
-  NewMessage({this.showEmoji, this.messageController, this.MsgFunction});
+  String userid;
+  Future<void> Function(String message, String userId, String msgType)
+      MsgFunction;
+  NewMessage(
+      {this.showEmoji, this.messageController, this.userid, this.MsgFunction});
   @override
   _NewMessageState createState() => _NewMessageState();
 }
@@ -49,7 +52,7 @@ class _NewMessageState extends State<NewMessage> {
                     hintText: "Enter message",
                     border: InputBorder.none,
                   ),
-                  keyboardType: TextInputType.multiline,
+                  // keyboardType: TextInputType.multiline,
                   autocorrect: true,
                   cursorColor: Colors.black87,
                 ),
@@ -64,7 +67,7 @@ class _NewMessageState extends State<NewMessage> {
                           Icons.camera_alt,
                           color: Colors.grey[600],
                         ),
-                        onTap: () {},
+                        // onTap: () {},
                       ),
                     )
                   ],
@@ -72,9 +75,18 @@ class _NewMessageState extends State<NewMessage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  widget.MsgFunction(widget.messageController.text);
-                  widget.messageController.clear();
-                  Focus.of(context).unfocus();
+                  //send msg function
+                  if (widget.messageController.text.trim() == '') {
+                    return null;
+                  } else {
+                    widget.MsgFunction(
+                      widget.messageController.text.trim(),
+                      widget.userid,
+                      "text",
+                    );
+                    widget.messageController.clear();
+                    Focus.of(context).unfocus();
+                  }
                 },
                 child: Icon(
                   Icons.send,
