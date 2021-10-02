@@ -1,6 +1,7 @@
 import UIKit
 import Flutter
 
+// Screen Launching Section
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
   override func application(
